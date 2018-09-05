@@ -20,13 +20,6 @@ mafft, http://mafft.cbrc.jp/alignment/software/
 # Usage Information
 
 This is a scientific command line style script, so all you have to do to install is clone this repository and perform the above prerequisite installations
-
-For help with other options, simply type  
-
-```
-python quentin.py -h
-```
-
 If you have any questions, you can reach me at Joseph.Gussler@cdc.hhs.gov
 
 # A note about input/output formatting
@@ -46,6 +39,10 @@ exampleout.png - expected output from running the following command:
 python quentin.py spreader.fas target.fas
 ```
 This command will run the program assuming lsqlin.py, quentin.py and the hcv fasta files are all in the current working directory. Your output (default tmp.png) should look similar to exampleout.png
+For help with other options, simply type  
+```
+python quentin.py -h
+```
 LICENSE.txt - GNU public license
     
 # Acknowledgements
