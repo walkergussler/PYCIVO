@@ -19,14 +19,8 @@ mafft, http://mafft.cbrc.jp/alignment/software/
 
 # Usage Information
 
-This is a scientific command line style script, so all you have to do to install is download quentin.py and lsqlin.py and have your system being able to find these files when you run the script
-This is primarily a command line utility program. To run, type something along the lines of  
+This is a scientific command line style script, so all you have to do to install is clone this repository and perform the above prerequisite installations
 
-```
-python quentin.py spreader.fas target.fas
-```
-
-this will run the program assuming lsqlin.py, quentin.py and the hcv fasta files are all in the current working directory. Your output (default tmp.png) should look similar to output.png
 For help with other options, simply type  
 
 ```
@@ -43,6 +37,16 @@ For each entry, your sequence ID should end with a number following the trailing
 ```
 >P06_run12_alaska_3_2_25
 ```
+# What else is in this repository?
+
+EvolutionSimulation.gif - a looping short video which illustrates the process by which we simulate evolution from one patient to another
+spreader.fas, target.fas - two very small FASTA files which could be used to test your installation
+exampleout.png - expected output from running the following command:
+```
+python quentin.py spreader.fas target.fas
+```
+This command will run the program assuming lsqlin.py, quentin.py and the hcv fasta files are all in the current working directory. Your output (default tmp.png) should look similar to exampleout.png
+LICENSE.txt - GNU public license
     
 # Acknowledgements
 Valeriy Vishnevskiy - lsqlin.py
