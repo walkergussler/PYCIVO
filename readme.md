@@ -24,7 +24,9 @@ If you have any questions, you can reach me at Joseph.Gussler@cdc.hhs.gov
 
 # A note about input/output formatting
 Input must be a valid FASTA file.
+
 This program expects viral quasispecies populations (a pool of closely related mutants achieved through deep amplicon sequencing)
+
 For each entry, your sequence ID should end with a number following the trailing underscore which denotes the frequency of that variant. For example, here we have a sequence ID with a bunch of extra information that will give the appropriate frequency of 25 for that variant
 
 ```
@@ -33,12 +35,15 @@ For each entry, your sequence ID should end with a number following the trailing
 # What else is in this repository?
 
 EvolutionSimulation.gif - a looping short video which illustrates the process by which we simulate evolution from one patient to another
+
 spreader.fas, target.fas - two very small FASTA files which could be used to test your installation
+
 exampleout.png - expected output from running the following command:
 ```
 python quentin.py spreader.fas target.fas
 ```
 This command will run the program assuming lsqlin.py, quentin.py and the hcv fasta files are all in the current working directory. Your output (default tmp.png) should look similar to exampleout.png
+
 For help with other options, simply type  
 ```
 python quentin.py -h
