@@ -10,7 +10,6 @@ from tempfile import NamedTemporaryFile
 from collections import defaultdict
 import lsqlin
 from cvxopt.solvers import options
-from ghost.util import parallel
 
 import warnings
 from Bio import BiopythonWarning
@@ -303,10 +302,10 @@ def get_evol_time(haploNum,haploSize,seqs,f1HaploNum,PERCENT,FAILTIME,NOGHOST): 
     kStepList=calc_kstep(haploNum,haploSize,ordSeqs)
     
     finalSeqs=get_intermediate_sequences(kStepList,seqs,haploSize)
-    if not NOGHOST: # this part is commented out because it breaks my test for some reason
-        D_all=calc_distance_matrix(finalSeqs)
-    else:
+    if NOGHOST: # this part is commented out because it breaks my test for some reason
         D_all=calc_distance_matrix_slow(finalSeqs)
+    else:
+        D_all=calc_distance_matrix(finalSeqs)
     evolTime=simul_evol(D_all,f1HaploNum,f2HaploNum,len_eff,PERCENT,FAILTIME)
     return evolTime
 
@@ -350,10 +349,10 @@ class get_evol_times():
         else:
             input1=f1
             input2=f2
-        seqs1=calc_centroids(self.CLUSTERS,input1)
+        seqs1=calc_centroids(self.CLUSTERS,input1,NOGHOST)
         if seqs1==False:
             return False
-        seqs2=calc_centroids(self.CLUSTERS,input2)
+        seqs2=calc_centroids(self.CLUSTERS,input2,NOGHOST)
         
         seqs,f1HaploNum=combine_seqs(seqs1,seqs2) 
         haploSize=len(seqs[0])
@@ -371,10 +370,10 @@ def get_evol_times_serial(i1,i2,INPUTS,CLUSTERS,PERCENT,FAILTIME,NOGHOST,ALI):
     else:
         input1=f1
         input2=f2
-    seqs1=calc_centroids(CLUSTERS,input1)
+    seqs1=calc_centroids(CLUSTERS,input1,NOGHOST)
     if seqs1==False:
         return False
-    seqs2=calc_centroids(CLUSTERS,input2)
+    seqs2=calc_centroids(CLUSTERS,input2,NOGHOST)
     seqs,f1HaploNum=combine_seqs(seqs1,seqs2)
     haploSize=len(seqs[0])
     haploNum=len(seqs)
@@ -505,10 +504,10 @@ def source_from_features(INPUTS,ALI,NOGHOST): # determine source from list of fe
         
         #calculate maximum hamming distance (maxHamming)
         seqs_nofreqs=seqs.keys()
-        if not NOGHOST:
-            array=calc_distance_matrix(seqs_nofreqs)
-        else:
+        if NOGHOST:
             array=calc_distance_matrix_slow(seqs_nofreqs)
+        else:
+            array=calc_distance_matrix(seqs_nofreqs)
         maxHamming=np.amax(array)
         
         # calculate haplotide entropy (haploFreq)
@@ -536,10 +535,10 @@ def source_from_features(INPUTS,ALI,NOGHOST): # determine source from list of fe
         #calculate nucleotide diversity (nucDiv)
         totalFreq=totalReads
         freqs=[x/totalFreq for x in seqs.values()]
-        if not NOGHOST:
-            mat=calc_distance_matrix(seqs_nofreqs)
-        else:
+        if NOGHOST:
             mat=calc_distance_matrix_slow(seqs_nofreqs)
+        else:
+            mat=calc_distance_matrix(seqs_nofreqs)
         nucDiv=0
         for a,b in itertools.combinations(range(haploNum),2):
             nucDiv+=freqs[a]*freqs[b]*mat[a,b]*2/float(haploSize)
@@ -634,12 +633,15 @@ def consensus_seq(seqs):
         return ''.join(out)
         
 
-def calc_centroids(nclust,filename):
+def calc_centroids(nclust,filename,NOGHOST):
     # print('clustering, '+filename)
     dict=parse_input(filename)
     seqs=dict.keys()
     freq=dict.values()  
-    DM=calc_distance_matrix(seqs)
+    if NOGHOST:
+        DM=calc_distance_matrix_slow(seqs)
+    else:    
+        DM=calc_distance_matrix(seqs)
     nseq = len(seqs)
     centroids = []
     if nseq>nclust:
@@ -1386,6 +1388,7 @@ def main(INPUTS,ALI,FAILTIME,PERCENT,NOGHOST,OUTPUT,CLUSTERS): #overall wrapper 
             DSamp[i2,i1]=b
 #####for parallel processing##################################################################################################################
     else:
+        from ghost.util import parallel
         parallelFunc=get_evol_times()
         with parallel.Parallel() as parallel_executor:
             for (f,b,i1,i2) in parallel_executor.map(parallelFunc,itertools.combinations(range(len(INPUTS)),2)):
