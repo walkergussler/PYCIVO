@@ -1,6 +1,6 @@
 # INSCAPE 
 HCV directionality prediction software implemented in python  
-Based off Pavel Skums' QUENTIN https://github.com/skumsp/quentin  
+Based off Pavel Skums' [QUENTIN](https://github.com/skumsp/quentin)
 Call this program on a suspected cluster of clinical samples of viral dna for transmission network inference  
 Python 2.7 code
 # Prerequisites
@@ -13,16 +13,16 @@ biopython
 networkx  
 cvxopt  
 ### other prerequisites
-lsqlin.py (included on this github) - https://github.com/scivision/airtools/blob/master/airtools/lsqlin.py
-graphviz, http://www.graphviz.org/  
-mafft, http://mafft.cbrc.jp/alignment/software/  
+[lsqlin.py](https://github.com/scivision/airtools/blob/master/airtools/lsqlin.py) (included on this github)
+[graphviz](http://www.graphviz.org/)
+[mafft](http://mafft.cbrc.jp/alignment/software/)
 
 # Usage Information
 
 This is a scientific command line style script, so all you have to do to install is clone this repository and perform the above prerequisite installations
 If you have any questions, you can reach me at Joseph.Gussler@cdc.hhs.gov
 
-# A note about input/output formatting
+# A note about input formatting
 Input must be a valid FASTA file.
 
 This program expects viral quasispecies populations (a pool of closely related mutants achieved through deep amplicon sequencing)
@@ -40,13 +40,13 @@ spreader.fas, target.fas - two very small FASTA files which could be used to tes
 
 exampleout.png - expected output from running the following command:
 ```
-python quentin.py spreader.fas target.fas
+python inscape.py spreader.fas target.fas
 ```
-This command will run the program assuming lsqlin.py, quentin.py and the hcv fasta files are all in the current working directory. Your output (default tmp.png) should look similar to exampleout.png
+This command will run the program assuming lsqlin.py, inscape.py and the hcv fasta files are all in the current working directory. Your output (default tmp.png) should look similar to exampleout.png
 
 For help with other options, simply type  
 ```
-python quentin.py -h
+python inscape.py -h
 ```
 LICENSE.txt - GNU public license
     
