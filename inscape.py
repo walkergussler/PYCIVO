@@ -1216,7 +1216,12 @@ def print_components(DSamp,INPUTS,S,C): #complain and print (more than two conne
     sys.exit("exiting QUENTIN...")        
 
 def main(INPUTS,ALI,FAILTIME,PERCENT,NOGHOST,OUTPUT,CLUSTERS): #overall wrapper - wraps the wrappers, checks some things
-    print('Welcome to INSCAPE! Running evolutionary simulations...')
+    print('Welcome to INSCAPE!')
+    print('reducing files to '+str(CLUSTERS)+' seqs')
+    if ALI:
+        print('files will be aligned')
+    else:
+        print('files should already be aligned')
     options['show_progress'] = False #silences output of lsqlin (very annoying, little information contained)
     startTime = time.time()
     numFiles=len(INPUTS)
@@ -1227,6 +1232,7 @@ def main(INPUTS,ALI,FAILTIME,PERCENT,NOGHOST,OUTPUT,CLUSTERS): #overall wrapper 
             sys.exit("Warning! The above file may not be in fasta format, this will almost certainly cause an error later. Exiting")
 #####for serial processing####################################################################################################################
     if NOGHOST: 
+        print('Running evolutionary simulations without ghost...')
         for i1,i2 in itertools.combinations(range(len(INPUTS)),2):
             a=get_evol_times_serial(i1,i2,INPUTS,CLUSTERS,PERCENT,FAILTIME,NOGHOST,ALI)
             if a==False:
@@ -1237,6 +1243,7 @@ def main(INPUTS,ALI,FAILTIME,PERCENT,NOGHOST,OUTPUT,CLUSTERS): #overall wrapper 
             DSamp[i2,i1]=b
 #####for parallel processing##################################################################################################################
     else:
+        print('Running evolutionary simulations with ghost...')
         from ghost.util import parallel
         parallelFunc=get_evol_times()
         with parallel.Parallel() as parallel_executor:
