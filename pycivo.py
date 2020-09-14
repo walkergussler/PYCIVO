@@ -18,7 +18,7 @@ from Bio import SeqIO
 
 __author__ = "J Walker Gussler"
 
-"""INSCAPE (INference of Super-spreaders through Computational Analysis of quasisPEcies), by J Walker Gussler
+"""PYCIVO (INference of Super-spreaders through Computational Analysis of quasisPEcies), by J Walker Gussler
 Given a number of .fas clinical HCV samples of HVR1 sequenced by the GHOST protocol, this program will determine the presence of any super-spreaders, if applicable
  
 1. It requires as input the path to the aligned fasta files. All sequences are assumed to be unique.
@@ -514,8 +514,8 @@ def figure(times,predictions,INPUTS,expect):
     #makes sure that the predicted source values are high enough to warrant a report
     zevo=zscore(list(times.values()))
     zfeatures=zscore(list(predictions.values()))
-    print('features, evolution')
-    print(','.join(map(str,map(max,[zfeatures,zevo]))))
+    # print('features, evolution')
+    # print(','.join(map(str,map(max,[zfeatures,zevo]))))
     minz=min(map(max,[zfeatures,zevo]))
     if minz>2:
         return expect, True
@@ -595,9 +595,7 @@ def render_with_graphviz(transnet,fileList,OUTPUT,strength,probD,expect):
         gr=matrix_to_weighted_NX(transnet,shortNames,probD)
     with NamedTemporaryFile(delete=False) as tmpdot:
         tmpdotname=tmpdot.name
-        print('doing it')
         nx.drawing.nx_agraph.write_dot(gr,tmpdotname)
-        print('did it')
     if strength==False:
         lineco=0
         with open(tmpdotname,'r') as f:
@@ -1203,11 +1201,22 @@ def print_components(DSamp,INPUTS,S,C): #complain and print (more than two conne
             print(rerun)
         else:
             print("%s does not appear to be connected to any of the other files" % runlist[0])
-    sys.exit("exiting INSCAPE...")        
+    sys.exit("exiting PYCIVO...")        
 
-def main(INPUTS,ALI,FAILTIME,PERCENT,NOGHOST,OUTPUT,CLUSTERS,QUIET): #overall wrapper - wraps the wrappers, checks some things
+def render_text_output(INPUTS,OUTPUT,strength,workTime,source):
+    with open(OUTPUT+'.txt','w') as f:
+        f.write("PYCIVO completed successfully on the following FASTA files!\n")
+        for i in INPUTS:
+            f.write(i+'\n')
+        if strength==True:
+            f.write('Among the given samples, %s appears to be the most likely candidate for the source' % source)
+        else:
+            f.write("PYCIVO analysis: LOW CONFIDENCE PREDICTION! %s is the predicted source. Analysis took %.3f seconds. Thank you for using PYCIVO!" % (source, workTime))
+        f.write('\n')
+
+def main(INPUTS,ALI,FAILTIME,PERCENT,NOGHOST,OUTPUT,CLUSTERS,QUIET,INFER_NETWORK): #overall wrapper - wraps the wrappers, checks some things
     if not QUIET:
-        print('Welcome to INSCAPE!')
+        print('Welcome to PYCIVO!')
         print('reducing files to '+str(CLUSTERS)+' seqs')
         if ALI:
             print('files will be aligned')
@@ -1257,9 +1266,7 @@ def main(INPUTS,ALI,FAILTIME,PERCENT,NOGHOST,OUTPUT,CLUSTERS,QUIET): #overall wr
         workTime =  endTime - startTime
         statement_time='Analysis took %.3f seconds' % workTime
         sys.exit(statement_time)
-    for row in DSamp:
-        print(row)
-    [S,C]=determine_components(DSamp) #S==number of connected components in the graph (number of outbreaks by INSCAPE metric)        
+    [S,C]=determine_components(DSamp) #S==number of connected components in the graph (number of outbreaks by PYCIVO metric)        
     #if S==1, we have a normal outbreak with all cases related. Software can automatically remove one guy if hes apart but otherwise we just complain and print
     if S>1:
         if S==2: #2 components, see if we can just remove that one guy and continue
@@ -1279,8 +1286,6 @@ def main(INPUTS,ALI,FAILTIME,PERCENT,NOGHOST,OUTPUT,CLUSTERS,QUIET): #overall wr
     #type(outdegree.values()[0])===int (ties ok)
     #make sure they all agree, otherwise error out
     # if not QUIET:
-    for row in DSamp:
-        print(row)
     times=outdegree_source(DSamp,INPUTS,QUIET)
     timeSource=max_dict_index(times)
     
@@ -1301,32 +1306,33 @@ def main(INPUTS,ALI,FAILTIME,PERCENT,NOGHOST,OUTPUT,CLUSTERS,QUIET): #overall wr
     workTime =  time.time() - startTime
     # print('wtf')
     if timeSource==featureSource:
-        print('they equal')
         expect=timeSource
         source,strength=figure(times,predictions,INPUTS,timeSource)
         if strength==True:
             print('Among the given samples, %s appears to be the most likely candidate for the source' % source)
         else:
-            print("INSCAPE analysis: LOW CONFIDENCE PREDICTION! %s is the predicted source. Analysis took %.3f seconds. Thank you for using INSCAPE!" % (source, workTime))
-        transnet,tDict=find_transnet_MCMC(DSamp,FAILTIME)
-        probD=np.zeros(np.shape(DSamp))
-        treeLen=len(DSamp)*2-1
-        print("hi")
-        if tDict!={}:
-            for a in tDict:
-                tr=np.fromstring(a).reshape(treeLen,3)
-                tn=tree_to_transnet(tr,DSamp,len(DSamp))
-                probD+=tn.astype(bool)*tDict[a]
-            render_with_graphviz(transnet,INPUTS,OUTPUT,strength,probD,expect)
+            print("PYCIVO analysis: LOW CONFIDENCE PREDICTION! %s is the predicted source. Analysis took %.3f seconds. Thank you for using PYCIVO!" % (source, workTime))
+        if INFER_NETWORK:
+            transnet,tDict=find_transnet_MCMC(DSamp,FAILTIME)
+            probD=np.zeros(np.shape(DSamp))
+            treeLen=len(DSamp)*2-1
+            print("hi")
+            if tDict!={}:
+                for a in tDict:
+                    tr=np.fromstring(a).reshape(treeLen,3)
+                    tn=tree_to_transnet(tr,DSamp,len(DSamp))
+                    probD+=tn.astype(bool)*tDict[a]
+                render_with_graphviz(transnet,INPUTS,OUTPUT,strength,probD,expect)
+            else:
+                render_with_graphviz(transnet,INPUTS,OUTPUT,strength,False,expect)
         else:
-            render_with_graphviz(transnet,INPUTS,OUTPUT,strength,False,expect)
+            workTime =  time.time() - startTime
+            render_text_output(INPUTS,OUTPUT,strength,workTime,source)
     else:
-        print('they not equal')
-        print('features, evolution')
         print(featureSource,timeSource)
-        sys.exit('INSCAPE analysis: source undeterminable or not present - feature source != evolution source! Analysis took %.3f seconds. Thank you for using INSCAPE!' % workTime)
+        sys.exit('PYCIVO analysis: source undeterminable or not present - feature source != evolution source! Analysis took %.3f seconds. Thank you for using PYCIVO!' % workTime)
     # os.system('firefox tmp.png')
-    sys.exit('INSCAPE analyis was successful! Analysis took %.3f seconds. Thank you for using INSCAPE!' % workTime)
+    sys.exit('PYCIVO analyis was successful! Analysis took %.3f seconds. Thank you for using PYCIVO!' % workTime)
     
 ###STATIC VARIABLES###
 ALI_DEFAULT=False
@@ -1335,16 +1341,18 @@ PERCENT_DEFAULT=100
 NOGHOST_DEFAULT=True
 CLUSTERS_DEFAULT=100
 QUIET_DEFAULT=True
+INFER_NETWORK_DEFAULT=False
+OUTPUT_DEFAULT="PYCIVO_OUTPUT"
 ###STATIC VARIABLES###
 
 if __name__ == '__main__':
     import argparse # possible arguments to add: delta, nIter
-    parser = argparse.ArgumentParser(description='INSCAPE: predict directionality of HCV infection')
+    parser = argparse.ArgumentParser(description='PYCIVO: predict directionality of HCV infection')
     parser.add_argument('files',
         nargs='+',
         help="List  of  files  to  be  analyzed,  order  of  files  does  not  matter")
     parser.add_argument('-o','--output', 
-        type=str, required=False, default="tmp",
+        type=str, required=False, default=OUTPUT_DEFAULT,
         help="The name of the output .png file")
     parser.add_argument('-a',  '--align', 
         action='store_true',  default=ALI_DEFAULT,
@@ -1364,6 +1372,9 @@ if __name__ == '__main__':
     parser.add_argument('-q', '--quiet', 
         action='store_true', default=QUIET_DEFAULT,
         help="Pass this flag to process files without the use of ghost")
+    parser.add_argument('-in', '--inferNetwork', 
+        action='store_true', default=INFER_NETWORK_DEFAULT,
+        help="Pass this flag to process files without the use of ghost")
     
     args = parser.parse_args()
     INPUTS=args.files
@@ -1374,4 +1385,5 @@ if __name__ == '__main__':
     OUTPUT=args.output
     CLUSTERS=args.numClusters
     QUIET=args.quiet
-    main(INPUTS,ALI,FAILTIME,PERCENT,NOGHOST,OUTPUT,CLUSTERS,QUIET)
+    INFER_NETWORK=args.inferNetwork
+    main(INPUTS,ALI,FAILTIME,PERCENT,NOGHOST,OUTPUT,CLUSTERS,QUIET,INFER_NETWORK)

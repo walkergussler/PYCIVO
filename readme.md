@@ -1,51 +1,51 @@
-# INSCAPE 
-INference of viral Spreaders through Computational Analysis of quasisPEcies
-HCV directionality prediction software implemented in python  
+# PYCIVO 
+Primary case inference in viral outbreaks through analysis of intra-host variant population
+HCV outbreak source attribution software implemented in python  
 Based off Pavel Skums' QUENTIN https://github.com/skumsp/quentin  
 Call this program on a suspected cluster of clinical samples of viral dna for transmission network inference  
-Python 3.3 code
-# Prerequisites
-### python modules which are not in the standard library
-numpy  
-scipy  
-fastcluster  
-six  
-biopython  
-networkx  
-cvxopt  
-pygraphviz
-### other prerequisites
-lsqlin.pyc (included on this github) - https://github.com/scivision/airtools/blob/master/airtools/lsqlin.py
-graphviz, http://www.graphviz.org/  
-mafft, http://mafft.cbrc.jp/alignment/software/  
 
+## Requirements
+Install necessary requirements for minimal text output with the following
+
+```
+pip install -r requirements.txt
+```
+
+Additionally, If you would like to use the -a option, you have to have mafft installed
+
+http://mafft.cbrc.jp/alignment/software/  
+
+If you want to infer the entire network, the network is output using graphviz
+
+graphviz, http://www.graphviz.org/  
+
+You also must install the pygraphviz python module for this to work
+
+The output will look similar to exampleout.png
 # Usage Information
 
-This is primarily a command line utility program. To run, type something along the lines of  
+To run, type the following into a console:  
 
 ```
-python inscape.py spreader.fas target.fas
+python pycivo.py primary_case.fas target.fas
 ```
 
-this will run the program assuming lsqlin.py, inscape.py and the hcv fasta files are all in the current working directory. Your output (default tmp.png) should look similar to exampleout.png
+The software will output to stdout as well as the output file (default PYCIVO_OUTPUT.txt) 
 For help with other options, simply type  
 
 ```
-python inscape.py -h
+python PYCIVO.py -h
 ```
 
 If you have any questions, you can reach me at Joseph.Gussler@cdc.hhs.gov
 
 # A note about input/output formatting
-Input must be a valid FASTA file.
-This program expects viral quasispecies populations (a pool of closely related mutants achieved through deep amplicon sequencing)
-For each entry, your sequence ID should end with a number following the trailing underscore which denotes the frequency of that variant. For example, here we have a sequence ID with a bunch of extra information that will give the appropriate frequency of 25 for that variant
-
+Input must be a valid FASTA file with some extra specifications. The software expects a multiple sequence alignment of populations of viral quasispecies achieved through deep amplicon sequencing. For each entry in each FASTA file, the ID line should display the frequency following the last underscore. For example, here is a correctly formatted sequence ID with an associated frequency of 25. 
 ```
 >P06_run12_alaska_3_2_25
 ```
-    
+
 # Acknowledgements
 Valeriy Vishnevskiy - lsqlin.py
-Pavel Skums - came up with the algorithm for QUENTIN, a precursor to INSCAPE
+Pavel Skums - devised the network inference algorithm QUENTIN 
 The rest of the DVH bioinformatics team @ CDC  
