@@ -1,0 +1,7 @@
+biopython==1.78
+cvxopt==1.2.5
+decorator==4.4.2
+fastcluster==1.1.26
+networkx==2.5
+numpy==1.19.2
+scipy==1.5.2

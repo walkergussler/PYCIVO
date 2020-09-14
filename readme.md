@@ -22,7 +22,7 @@ graphviz, http://www.graphviz.org/
 You also must install the pygraphviz python module for this to work
 
 The output will look similar to exampleout.png
-# Usage Information
+## Usage Information
 
 To run, type the following into a console:  
 
@@ -37,15 +37,15 @@ For help with other options, simply type
 python PYCIVO.py -h
 ```
 
-If you have any questions, you can reach me at Joseph.Gussler@cdc.hhs.gov
+If you have any questions, you can reach me at J.Walker.Gussler@gmail.com
 
-# A note about input/output formatting
+## A note about input/output formatting
 Input must be a valid FASTA file with some extra specifications. The software expects a multiple sequence alignment of populations of viral quasispecies achieved through deep amplicon sequencing. For each entry in each FASTA file, the ID line should display the frequency following the last underscore. For example, here is a correctly formatted sequence ID with an associated frequency of 25. 
 ```
 >P06_run12_alaska_3_2_25
 ```
 
-# Acknowledgements
+## Acknowledgements
 Valeriy Vishnevskiy - lsqlin.py
 Pavel Skums - devised the network inference algorithm QUENTIN 
 The rest of the DVH bioinformatics team @ CDC  
