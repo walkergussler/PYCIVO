@@ -3,5 +3,5 @@ cvxopt==1.2.7
 decorator==4.4.2
 fastcluster==1.1.26
 networkx==2.5
-numpy==1.19.2
+numpy==1.22.0
 scipy==1.5.2
